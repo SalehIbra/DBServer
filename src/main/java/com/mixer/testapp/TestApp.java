@@ -1,6 +1,7 @@
 package com.mixer.testapp;
 
 import com.mixer.raw.FileHandler;
+import com.mixer.raw.Index;
 import com.mixer.raw.Person;
 
 import java.io.FileNotFoundException;
@@ -15,6 +16,8 @@ public class TestApp {
 
             fileHandler = new FileHandler("Dbserver.db");
             Person person = fileHandler.readRow(0);
+
+            System.out.println("total number of rows in database:"+ Index.getInstance().getTotalNumberOfRows());
             System.out.println(person);
 
             fileHandler.close();

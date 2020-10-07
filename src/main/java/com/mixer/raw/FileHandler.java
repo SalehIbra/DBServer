@@ -1,6 +1,7 @@
 package com.mixer.raw;
 
 import java.io.*;
+import java.sql.SQLOutput;
 
 public class FileHandler {
     private RandomAccessFile dbFile;
@@ -15,7 +16,8 @@ public class FileHandler {
                              String carPlateNumber,
                              String description) throws IOException {
         // seek to the end of the file
-        this.dbFile.seek(this.dbFile.length());
+        long currentPositionToInsert = this.dbFile.length();
+        this.dbFile.seek(currentPositionToInsert);
 
         // isDeleted byte
         // record length : int
@@ -63,11 +65,16 @@ public class FileHandler {
         this.dbFile.writeInt(description.length());
         this.dbFile.write(description.getBytes());
 
+        Index.getInstance().add(currentPositionToInsert);
      return true;
     }
 
     public Person readRow(int rowNumber) throws IOException {
-            byte[] row = readRowRecord(rowNumber);
+            long bytePosition = Index.getInstance().getBytePosition(rowNumber);
+            if(bytePosition == -1){
+                return null;
+            }
+            byte[] row = readRowRecord(bytePosition);
             Person person = new Person();
             DataInputStream stream = new DataInputStream(new ByteArrayInputStream(row));
 
@@ -97,20 +104,41 @@ public class FileHandler {
             return person;
         }
 
-    private byte[] readRowRecord(int rowNumber) throws IOException {
-                this.dbFile.seek(0);
+    private byte[] readRowRecord(long bytePositionOfRow) throws IOException {
+                this.dbFile.seek(bytePositionOfRow);
                 if(this.dbFile.readBoolean())
                     return new byte[0];
 
-                this.dbFile.seek(rowNumber + 1);
+                this.dbFile.seek(bytePositionOfRow + 1);
                 int recordLength = this.dbFile.readInt();
 
-                this.dbFile.seek(rowNumber + 5);
+                this.dbFile.seek(bytePositionOfRow + 5);
 
                 byte[] data = new byte[recordLength];
                 this.dbFile.read(data);
 
                 return data;
+    }
+
+    public void loadAllDataToIndex() throws IOException {
+        if(this.dbFile.length() == 0)
+            return;
+        long currentPos = 0;
+        int rowNum = 0;
+        while (currentPos < this.dbFile.length()){
+            this.dbFile.seek(currentPos);
+            boolean isDeleted = this.dbFile.readBoolean();
+            if(!isDeleted){
+                Index.getInstance().add(currentPos);
+                rowNum ++;
+            }
+            currentPos +=1;
+            this.dbFile.seek(currentPos);
+            int recordLength = this.dbFile.readInt();
+            currentPos +=4;
+            currentPos += recordLength;
+        }
+        System.out.println("Total number of rows in the Database : "+ rowNum);
     }
 
     public void close() throws IOException {
