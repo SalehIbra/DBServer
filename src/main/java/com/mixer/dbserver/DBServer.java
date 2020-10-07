@@ -27,7 +27,9 @@ public class DBServer implements DB{
 
     @Override
     public void delete(int rowNumber) throws IOException {
-
+        if(rowNumber < 0)
+            throw new IOException("Row number is less than zero");
+        this.fileHandler.deleteRow(rowNumber);
     }
 
     @Override

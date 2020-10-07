@@ -1,7 +1,6 @@
 package com.mixer.raw;
 
 import java.io.*;
-import java.sql.SQLOutput;
 
 public class FileHandler {
     private RandomAccessFile dbFile;
@@ -125,12 +124,15 @@ public class FileHandler {
             return;
         long currentPos = 0;
         int rowNum = 0;
+        int deletedRowNum = 0;
         while (currentPos < this.dbFile.length()) {
             this.dbFile.seek(currentPos);
             boolean isDeleted = this.dbFile.readBoolean();
             if (!isDeleted) {
                 Index.getInstance().add(currentPos);
                 rowNum++;
+            } else {
+                deletedRowNum ++;
             }
             currentPos += 1;
             this.dbFile.seek(currentPos);
@@ -138,10 +140,24 @@ public class FileHandler {
             currentPos += 4;
             currentPos += recordLength;
         }
-        System.out.println(" File Handler load : Total rows number in the Database : " + rowNum);
+        System.out.println("After startup : total rows number in the Database : " + rowNum);
+        System.out.println("After startup : total deleted rows  in the Database : " + deletedRowNum);
     }
 
     public void close() throws IOException {
         this.dbFile.close();
+    }
+
+    public void deleteRow(int rowNumber) throws IOException {
+        long bytePositionOfRecord = Index.getInstance().getBytePosition(rowNumber);
+        if(bytePositionOfRecord == -1) {
+            throw new IOException("Row doesn't exists in the index");
+        }
+        this.dbFile.seek(bytePositionOfRecord);
+        this.dbFile.writeBoolean(true);
+
+        //Update the index
+        Index.getInstance().remove(rowNumber);
+
     }
 }
