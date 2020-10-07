@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class Index {
     private static Index index;
     // row number, byte position
-    private HashMap<Long,Long> rowIndex;
+    private HashMap<Long, Long> rowIndex;
     private long totalRowNumber = 0;
 
     private Index() {
@@ -18,33 +18,38 @@ public class Index {
     }
 
     public static Index getInstance() {
-            if (index == null) {
-                index = new Index();
-            }
+        if (index == null) {
+            index = new Index();
+        }
         return index;
     }
 
-    public void add(long bytePosition){
-        this.rowIndex.put(totalRowNumber,bytePosition);
-        this.totalRowNumber++ ;
+    public void add(long bytePosition) {
+        this.rowIndex.put(totalRowNumber, bytePosition);
+        this.totalRowNumber++;
     }
 
-    public void remove(int row){
-    this.rowIndex.remove(row);
-    this.totalRowNumber-- ;
+    public void remove(int row) {
+        this.rowIndex.remove(row);
+        this.totalRowNumber--;
     }
 
-    public long getTotalNumberOfRows(){
+    public long getTotalNumberOfRows() {
         return this.totalRowNumber;
     }
 
-    public long getBytePosition(long rowNumber){
+    public long getBytePosition(long rowNumber) {
     /*    if(!this.rowIndex.containsKey(rowNumber)){
             return -1;
         }
         return this.rowIndex.get(rowNumber);*/
 
-        return this.rowIndex.getOrDefault(rowNumber,-1L);
+        return this.rowIndex.getOrDefault(rowNumber, -1L);
+    }
+
+    public void clear(){
+        this.totalRowNumber = 0;
+        this.rowIndex.clear();
     }
 
 }

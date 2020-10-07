@@ -50,10 +50,10 @@ public class Person {
     @Override
     public String toString() {
         return String.format("name: %s, age: %d, address: %S, car plate: %S, description: %S",
-                             this.name,
-                             this.age,
-                             this.address,
-                             this.carPlateNumber,
-                             this.description);
+                this.name,
+                this.age,
+                this.address,
+                this.carPlateNumber,
+                this.description);
     }
 }
