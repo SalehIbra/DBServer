@@ -4,9 +4,11 @@ import com.mixer.exceptions.DuplicateNameException;
 import com.mixer.raw.FileHandler;
 import com.mixer.raw.Index;
 import com.mixer.raw.Person;
+import com.mixer.util.DebugRowInfo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 public class DBServer implements DB{
     private FileHandler fileHandler;
@@ -48,5 +50,9 @@ public class DBServer implements DB{
     public void close() throws IOException {
         Index.getInstance().clear();
         this.fileHandler.close();
+    }
+
+    public List<DebugRowInfo> listAllRowWithDebug() throws IOException {
+        return this.fileHandler.loadAllDataFromFile();
     }
 }

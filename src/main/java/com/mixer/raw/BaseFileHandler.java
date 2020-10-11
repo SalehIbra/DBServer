@@ -1,6 +1,10 @@
 package com.mixer.raw;
 
+import com.mixer.util.DebugRowInfo;
+
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseFileHandler {
     RandomAccessFile dbFile;
@@ -88,5 +92,27 @@ public class BaseFileHandler {
 
     public void close() throws IOException {
         this.dbFile.close();
+    }
+
+    public List<DebugRowInfo> loadAllDataFromFile() throws IOException {
+        if(this.dbFile.length() == 0){
+            return new ArrayList<>();
+        }
+        List<DebugRowInfo> result = new ArrayList<>();
+        long currentPosition = 0;
+        while (currentPosition < this.dbFile.length()){
+            this.dbFile.seek(currentPosition);
+            boolean isDeleted = this.dbFile.readBoolean();
+            currentPosition += 1;
+            int recordLength = this.dbFile.readInt();
+            currentPosition += 4;
+            byte[] b = new byte[recordLength];
+            this.dbFile.read(b);
+            Person person = this.readFromByteStream(new DataInputStream(new ByteArrayInputStream(b)));
+            result.add(new DebugRowInfo(person,isDeleted));
+            currentPosition += recordLength;
+
+        }
+        return result;
     }
 }

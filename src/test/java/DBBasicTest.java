@@ -66,6 +66,38 @@ public class DBBasicTest {
         }
     }
 
+    @Test
+    public void testUpdateByName(){
+        try {
+            Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
+            db.add(person);
+
+            Person person2 = new Person("John2", 44, "Berlin", "www-123", "This is description");
+            this.db.update("John",person2);
+
+            Person result = this.db.read(0);
+            Assert.assertEquals(result.getName(),"John2");
+        } catch (IOException | DuplicateNameException e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testUpdateByRowNumber(){
+        try {
+            Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
+            db.add(person);
+
+            Person person2 = new Person("John2", 44, "Berlin", "www-123", "This is description");
+            this.db.update(0,person2);
+
+            Person result = this.db.read(0);
+            Assert.assertEquals(result.getName(),"John2");
+        } catch (IOException | DuplicateNameException e) {
+            Assert.fail();
+        }
+    }
+
     @After
     public void after(){
         try {
