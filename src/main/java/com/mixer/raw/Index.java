@@ -11,10 +11,13 @@ public class Index {
     private static Index index;
     // row number, byte position
     private HashMap<Long, Long> rowIndex;
+    //for update by row, String name long rownumber
+    private HashMap<String,Long> nameIndex;
     private long totalRowNumber = 0;
 
     private Index() {
         this.rowIndex = new HashMap<>();
+        this.nameIndex = new HashMap<>();
     }
 
     public static Index getInstance() {
@@ -29,7 +32,7 @@ public class Index {
         this.totalRowNumber++;
     }
 
-    public void remove(int row) {
+    public void remove(long row) {
         this.rowIndex.remove(row);
         this.totalRowNumber--;
     }
@@ -47,9 +50,20 @@ public class Index {
         return this.rowIndex.getOrDefault(rowNumber, -1L);
     }
 
+    public void addNameToIndex(final String name,long rowIndex){
+        this.nameIndex.put(name,rowIndex);
+    }
+    public boolean hasNameInIndex(final String name){
+        return this.nameIndex.containsKey(name);
+    }
+    public long getRowNumberByName(final String name){
+        return this.nameIndex.get(name);
+    }
+
     public void clear(){
         this.totalRowNumber = 0;
         this.rowIndex.clear();
+        this.nameIndex.clear();
     }
 
 }

@@ -10,11 +10,15 @@ public class TestApp {
         final String dbFile = "Dbserver.db";
         try {
             DB db = new DBServer(dbFile);
-            db.add("John", 44, "Berlin", "www-123", "This is description");
+            Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
+            db.add(person);
             System.out.println("Total number of rows in database:" + Index.getInstance().getTotalNumberOfRows());
 
-            db.delete(0);
+            Person updatedPerson = new Person("John1", 44, "Berlin", "www-123", "This is description");
+            db.update("John",updatedPerson);
+            System.out.println(db.read(0).toString());
             System.out.println(Index.getInstance().getTotalNumberOfRows());
+
 
             db.close();
         } catch (Exception e) {

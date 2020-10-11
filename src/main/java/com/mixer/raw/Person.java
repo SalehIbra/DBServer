@@ -11,6 +11,17 @@ public class Person {
         return name;
     }
 
+    public Person() {
+    }
+
+    public Person(String name, int age, String address, String carPlateNumber, String description) {
+        this.name = name;
+        this.age = age;
+        this.address = address;
+        this.carPlateNumber = carPlateNumber;
+        this.description = description;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

@@ -1,5 +1,6 @@
 package com.mixer.dbserver;
 
+import com.mixer.exceptions.DuplicateNameException;
 import com.mixer.raw.FileHandler;
 import com.mixer.raw.Index;
 import com.mixer.raw.Person;
@@ -16,12 +17,12 @@ public class DBServer implements DB{
     }
 
     @Override
-    public void add(String name, int age, String address, String carPlateNumber, String description) throws IOException {
-        this.fileHandler.add(name,age,address,carPlateNumber,description);
+    public void add(Person person) throws IOException, DuplicateNameException {
+        this.fileHandler.add(person.getName(),person.getAge(),person.getAddress(),person.getCarPlateNumber(),person.getDescription());
     }
 
     @Override
-    public Person read(int rowNumber) throws IOException {
+    public Person read(long rowNumber) throws IOException {
         return this.fileHandler.readRow(rowNumber);
     }
 
@@ -30,6 +31,17 @@ public class DBServer implements DB{
         if(rowNumber < 0)
             throw new IOException("Row number is less than zero");
         this.fileHandler.deleteRow(rowNumber);
+    }
+
+    @Override
+    public void update(long rowNumber, Person person) throws IOException, DuplicateNameException {
+        this.fileHandler.update(rowNumber,person.getName(),person.getAge(),person.getAddress(),person.getCarPlateNumber(),person.getDescription());
+    }
+
+    @Override
+    public void update(String name, Person person) throws IOException, DuplicateNameException {
+        this.fileHandler.update(name,person.getName(),person.getAge(),person.getAddress(),person.getCarPlateNumber(),person.getDescription());
+
     }
 
     @Override
