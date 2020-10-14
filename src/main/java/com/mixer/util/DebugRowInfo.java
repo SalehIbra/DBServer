@@ -2,6 +2,9 @@ package com.mixer.util;
 
 import com.mixer.raw.Person;
 
+/**
+ * This class used to debug information about database file rows
+ */
 public final class DebugRowInfo {
     private Person person;
     private boolean isDeleted;

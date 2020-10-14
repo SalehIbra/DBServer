@@ -6,6 +6,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class have all helper methods to File handler
+ */
 public class BaseFileHandler {
     RandomAccessFile dbFile;
 

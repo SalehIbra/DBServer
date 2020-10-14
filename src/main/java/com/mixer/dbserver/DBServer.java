@@ -6,10 +6,12 @@ import com.mixer.raw.Index;
 import com.mixer.raw.Person;
 import com.mixer.util.DebugRowInfo;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * This class for main operations on the database
+ */
 public class DBServer implements DB{
     private FileHandler fileHandler;
 
