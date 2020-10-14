@@ -3,9 +3,10 @@ package com.mixer.dbserver;
 import com.mixer.exceptions.DuplicateNameException;
 import com.mixer.raw.Person;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-public interface DB {
+public interface DB extends Closeable {
 
     void add(Person person) throws IOException, DuplicateNameException;
     Person read(long rowNumber) throws IOException;

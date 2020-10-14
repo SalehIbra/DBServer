@@ -12,10 +12,12 @@ import java.util.List;
 
 public class TestApp {
     final static String dbFile = "Dbserver.db";
+
     public static void main(String[] args) {
         new TestApp().performTest();
     }
-    private void performTest(){
+
+    private void performTest() {
         try {
             fillDb(10);
             delete(0);
@@ -27,27 +29,36 @@ public class TestApp {
         }
     }
 
-    void fillDb(int number) throws Exception{
-        DB db = new DBServer(dbFile);
-        for (int i = 0; i < number ; i++){
-            Person person = new Person("John"+i, 44, "Berlin", "www-123", "This is description");
-            db.add(person);
+    void fillDb(int number) throws Exception {
+        try (DB db = new DBServer(dbFile)) {
+            for (int i = 0; i < number; i++) {
+                Person person = new Person("John" + i, 44, "Berlin", "www-123", "This is description");
+                db.add(person);
+            }
+        } catch (IOException ioe) {
+            throw ioe;
         }
-        db.close();
     }
-    void delete(int rowNumber) throws Exception{
-        DB db = new DBServer(dbFile);
-        db.delete(rowNumber);
-        db.close();
+
+    void delete(int rowNumber) throws Exception {
+        try (DB db = new DBServer(dbFile)) {
+            db.delete(rowNumber);
+        } catch (IOException ioe) {
+            throw ioe;
+        }
     }
+
     void listAllRecord() throws Exception {
-        DBServer db = new DBServer(dbFile);
-        List<DebugRowInfo> result = db.listAllRowWithDebug();
-        System.out.println("Total row number :"+ Index.getInstance().getTotalNumberOfRows());
-        for(DebugRowInfo dri:result){
-            System.out.println(dri.toString());
+        try (DBServer db = new DBServer(dbFile)) {
+            List<DebugRowInfo> result = db.listAllRowWithDebug();
+            System.out.println("Total row number :" + Index.getInstance().getTotalNumberOfRows());
+            for (DebugRowInfo dri : result) {
+                System.out.println(dri.toString());
+            }
+            // result.stream().map(DebugRowInfo::toString).forEach(System.out::println);
+        } catch (IOException ioe) {
+            throw ioe;
         }
-        db.close();
 
 
     }

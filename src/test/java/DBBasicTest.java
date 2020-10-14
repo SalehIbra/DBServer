@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class DBBasicTest {
-    private DB db;
     private String dbFileName = "testdb.db";
 
     @Before
@@ -20,13 +19,11 @@ public class DBBasicTest {
         File file = new File(dbFileName);
         if(file.exists())
             file.delete();
-
-        this.db = new DBServer(dbFileName);
     }
 
     @Test
     public void testAdd(){
-        try {
+        try (DB db = new DBServer(dbFileName)){
             Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
             db.add(person);
             Assert.assertEquals(Index.getInstance().getTotalNumberOfRows(),1);
@@ -37,11 +34,11 @@ public class DBBasicTest {
 
     @Test
     public void testRead(){
-        try {
+        try (DB db = new DBServer(dbFileName)){
             Person p = new Person("John", 44, "Berlin", "www-404", "This is description");
             db.add(p);
             Assert.assertEquals(Index.getInstance().getTotalNumberOfRows(),1);
-            Person person = this.db.read(0);
+            Person person = db.read(0);
             Assert.assertEquals(person.getName(),"John");
             Assert.assertEquals(person.getAge(),44);
             Assert.assertEquals(person.getAddress(),"Berlin");
@@ -55,11 +52,11 @@ public class DBBasicTest {
 
     @Test
     public void testDelete(){
-        try {
+        try (DB db = new DBServer(dbFileName)){
             Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
             db.add(person);
             Assert.assertEquals(Index.getInstance().getTotalNumberOfRows(),1);
-            this.db.delete(0);
+            db.delete(0);
             Assert.assertEquals(Index.getInstance().getTotalNumberOfRows(),0);
         } catch (IOException | DuplicateNameException e) {
             Assert.fail();
@@ -68,14 +65,14 @@ public class DBBasicTest {
 
     @Test
     public void testUpdateByName(){
-        try {
+        try (DB db = new DBServer(dbFileName)){
             Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
             db.add(person);
 
             Person person2 = new Person("John2", 44, "Berlin", "www-123", "This is description");
-            this.db.update("John",person2);
+            db.update("John",person2);
 
-            Person result = this.db.read(0);
+            Person result = db.read(0);
             Assert.assertEquals(result.getName(),"John2");
         } catch (IOException | DuplicateNameException e) {
             Assert.fail();
@@ -84,26 +81,26 @@ public class DBBasicTest {
 
     @Test
     public void testUpdateByRowNumber(){
-        try {
+        try (DB db = new DBServer(dbFileName)){
             Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
             db.add(person);
 
             Person person2 = new Person("John2", 44, "Berlin", "www-123", "This is description");
-            this.db.update(0,person2);
+            db.update(0,person2);
 
-            Person result = this.db.read(0);
+            Person result = db.read(0);
             Assert.assertEquals(result.getName(),"John2");
         } catch (IOException | DuplicateNameException e) {
             Assert.fail();
         }
     }
 
-    @After
+/*    @After
     public void after(){
         try {
             this.db.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }
