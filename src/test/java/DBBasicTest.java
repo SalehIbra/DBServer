@@ -95,6 +95,25 @@ public class DBBasicTest {
         }
     }
 
+    @Test
+    public void testSearch(){
+        try (DB db = new DBServer(dbFileName)){
+            Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
+            db.add(person);
+
+            Person person2 = new Person("John1", 44, "Berlin", "www-123", "This is description");
+            db.add(person2);
+
+            Person result = db.search("John1");
+            Assert.assertEquals(result.getName(),"John1");
+            Assert.assertEquals(result.getAddress(),"Berlin");
+            Assert.assertEquals(result.getAge(),44);
+
+        } catch (IOException | DuplicateNameException e) {
+            Assert.fail();
+        }
+    }
+
 /*    @After
     public void after(){
         try {

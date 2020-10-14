@@ -38,6 +38,11 @@ public class DBServer implements DB{
     }
 
     @Override
+    public Person search(String name) throws IOException {
+        return this.fileHandler.search(name);
+    }
+
+    @Override
     public void update(long rowNumber, Person person) throws IOException, DuplicateNameException {
         this.fileHandler.update(rowNumber,person.getName(),person.getAge(),person.getAddress(),person.getCarPlateNumber(),person.getDescription());
     }

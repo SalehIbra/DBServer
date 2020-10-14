@@ -13,6 +13,8 @@ public interface DB extends Closeable {
     void update(long rowNumber,final Person person) throws IOException, DuplicateNameException;
     void update(String name,final Person person) throws IOException, DuplicateNameException;
     void delete(int rowNumber) throws IOException;
+    // Not List<Person>, we are adding now distinct names to our db
+    Person search(final String name) throws IOException;
     void close() throws IOException;
 
 }

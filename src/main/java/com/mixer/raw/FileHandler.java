@@ -112,4 +112,13 @@ public class FileHandler extends BaseFileHandler{
         System.out.println(rowNumber);
         this.update(rowNumber,name, age,address,carPlateNumber,description);
     }
+
+    public Person search(String name) throws IOException {
+        long rowNumber = Index.getInstance().getRowNumberByName(name);
+        if (rowNumber == -1){
+            return null;
+        } else{
+            return this.readRow(rowNumber);
+        }
+    }
 }

@@ -57,7 +57,7 @@ public class Index {
         return this.nameIndex.containsKey(name);
     }
     public long getRowNumberByName(final String name){
-        return this.nameIndex.get(name);
+        return this.nameIndex.getOrDefault(name,-1L);
     }
 
     public void clear(){

@@ -20,12 +20,18 @@ public class TestApp {
     private void performTest() {
         try {
             fillDb(10);
-            delete(0);
-            delete(2);
-            delete(5);
+            testSearch();
             listAllRecord();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    void testSearch() throws IOException {
+        try (DB db = new DBServer(dbFile)) {
+            Person person = db.search("John1");
+            System.out.println("Found Person : "+ person);
+        } catch (IOException ioe) {
+            throw ioe;
         }
     }
 
