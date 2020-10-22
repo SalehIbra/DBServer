@@ -1,6 +1,7 @@
 package com.mixer.raw;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Class to store indexed fields. When we search records, then we
@@ -10,9 +11,9 @@ import java.util.HashMap;
 public class Index {
     private static Index index;
     // row number, byte position
-    private HashMap<Long, Long> rowIndex;
+    private final HashMap<Long, Long> rowIndex;
     //for update by row, String name long rownumber
-    private HashMap<String,Long> nameIndex;
+    private final HashMap<String,Long> nameIndex;
     private long totalRowNumber = 0;
 
     private Index() {
@@ -58,6 +59,9 @@ public class Index {
     }
     public long getRowNumberByName(final String name){
         return this.nameIndex.getOrDefault(name,-1L);
+    }
+    public Set<String> getNames(){
+        return this.nameIndex.keySet();
     }
 
     public void clear(){

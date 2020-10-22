@@ -3,19 +3,19 @@ import com.mixer.dbserver.DBServer;
 import com.mixer.exceptions.DuplicateNameException;
 import com.mixer.raw.Index;
 import com.mixer.raw.Person;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class DBBasicTest {
-    private String dbFileName = "testdb.db";
+    private final String dbFileName = "testdb.db";
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         File file = new File(dbFileName);
         if(file.exists())
             file.delete();
@@ -108,6 +108,61 @@ public class DBBasicTest {
             Assert.assertEquals(result.getName(),"John1");
             Assert.assertEquals(result.getAddress(),"Berlin");
             Assert.assertEquals(result.getAge(),44);
+
+        } catch (IOException | DuplicateNameException e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testSearchLeveinshteinWith_0_Tolerance(){
+        try (DB db = new DBServer(dbFileName)){
+            Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
+            db.add(person);
+
+            Person person2 = new Person("John1", 44, "Berlin", "www-123", "This is description");
+            db.add(person2);
+
+            List<Person> result = db.searchWithLeveinshtein("John", 0);
+                Assert.assertEquals(result.size(),1);
+            Assert.assertEquals(result.get(0).getName(),"John");
+
+        } catch (IOException | DuplicateNameException e) {
+            Assert.fail();
+        }
+    }
+    @Test
+    public void testSearchLeveinshteinWith_1_Tolerance(){
+        try (DB db = new DBServer(dbFileName)){
+            Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
+            db.add(person);
+
+            Person person2 = new Person("John1", 44, "Berlin", "www-123", "This is description");
+            db.add(person2);
+
+
+            List<Person> result = db.searchWithLeveinshtein("John", 1);
+            Assert.assertEquals(result.size(),2);
+
+
+        } catch (IOException | DuplicateNameException e) {
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testSearchWithRegexp(){
+        try (DB db = new DBServer(dbFileName)){
+            Person person = new Person("John", 44, "Berlin", "www-123", "This is description");
+            db.add(person);
+
+            Person person2 = new Person("John1", 44, "Berlin", "www-123", "This is description");
+            db.add(person2);
+
+
+            List<Person> result = db.searchWithRegexp("Jo.*");
+            Assert.assertEquals(result.size(),2);
+
 
         } catch (IOException | DuplicateNameException e) {
             Assert.fail();

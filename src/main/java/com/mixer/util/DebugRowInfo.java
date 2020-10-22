@@ -6,8 +6,8 @@ import com.mixer.raw.Person;
  * This class used to debug information about database file rows
  */
 public final class DebugRowInfo {
-    private Person person;
-    private boolean isDeleted;
+    private final Person person;
+    private final boolean isDeleted;
 
     public DebugRowInfo(Person person, boolean isDeleted) {
         this.person = person;

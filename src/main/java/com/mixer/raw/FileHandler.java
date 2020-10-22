@@ -1,8 +1,12 @@
 package com.mixer.raw;
 
 import com.mixer.exceptions.DuplicateNameException;
+import com.mixer.util.Leveinshtein;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class FileHandler extends BaseFileHandler{
 
@@ -120,5 +124,47 @@ public class FileHandler extends BaseFileHandler{
         } else{
             return this.readRow(rowNumber);
         }
+    }
+
+    public List<Person> searchWithLeveinshtein(String name, int tolerance) throws IOException {
+        List<Person> result = new ArrayList<>();
+        Set<String> names = Index.getInstance().getNames();
+        List<String> goodNames = new ArrayList<>();
+        for (String storedNames: names){
+            if(Leveinshtein.leveinshteinDistance(storedNames,name) <= tolerance){
+                goodNames.add(storedNames);
+            }
+        }
+        // we have all names , get the records
+        for (String goodName: goodNames){
+            long rowIndex = Index.getInstance().getRowNumberByName(goodName);
+            if(rowIndex != -1){
+                Person person = this.readRow(rowIndex);
+                result.add(person);
+            }
+
+        }
+        return result;
+    }
+
+    public List<Person> searchWithRegexp(String regexp) throws IOException {
+        List<Person> result = new ArrayList<>();
+        Set<String> names = Index.getInstance().getNames();
+        List<String> goodNames = new ArrayList<>();
+        for (String storedNames: names){
+            if(storedNames.matches(regexp)){
+                goodNames.add(storedNames);
+            }
+        }
+        // we have all names , get the records
+        for (String goodName: goodNames){
+            long rowIndex = Index.getInstance().getRowNumberByName(goodName);
+            if(rowIndex != -1){
+                Person person = this.readRow(rowIndex);
+                result.add(person);
+            }
+
+        }
+        return result;
     }
 }

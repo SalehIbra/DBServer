@@ -13,7 +13,7 @@ import java.util.List;
  * This class for main operations on the database
  */
 public class DBServer implements DB{
-    private FileHandler fileHandler;
+    private final FileHandler fileHandler;
 
     public DBServer(String dbFileName) throws IOException {
         this.fileHandler = new FileHandler(dbFileName);
@@ -40,6 +40,16 @@ public class DBServer implements DB{
     @Override
     public Person search(String name) throws IOException {
         return this.fileHandler.search(name);
+    }
+
+    @Override
+    public List<Person> searchWithLeveinshtein(String name, int tolerance) throws IOException {
+        return this.fileHandler.searchWithLeveinshtein(name,tolerance);
+    }
+
+    @Override
+    public List<Person> searchWithRegexp(String regexp) throws IOException {
+        return this.fileHandler.searchWithRegexp(regexp);
     }
 
     @Override
