@@ -4,6 +4,7 @@ import com.mixer.raw.Person;
 
 /**
  * This class used to debug information about database file rows
+ * to know if it is deleted
  */
 public final class DebugRowInfo {
     private final Person person;

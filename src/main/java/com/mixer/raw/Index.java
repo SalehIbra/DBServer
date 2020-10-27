@@ -12,7 +12,8 @@ public class Index {
     private static Index index;
     // row number, byte position
     private final HashMap<Long, Long> rowIndex;
-    //for update by row, String name long rownumber
+    //for update by row we use this map to get list of names in db with the corresponding row number
+    // String name long rownumber
     private final HashMap<String,Long> nameIndex;
     private long totalRowNumber = 0;
 

@@ -11,11 +11,19 @@ import java.util.List;
  */
 public class BaseFileHandler {
     RandomAccessFile dbFile;
-
+    String dbFileName;
     public BaseFileHandler(final String dbFileName) throws FileNotFoundException {
+        this.dbFileName = dbFileName;
         this.dbFile = new RandomAccessFile(dbFileName, "rw");
     }
 
+    public BaseFileHandler(RandomAccessFile randomAccessFile,final String dbFileName) {
+        this.dbFileName = dbFileName;
+        this.dbFile = randomAccessFile;
+    }
+
+    // Read all data from the db file and fill the index map (name , rownumber)  with the
+    // required data to access database records.
     public void loadAllDataToIndex() throws IOException {
         if (this.dbFile.length() == 0)
             return;
@@ -47,6 +55,8 @@ public class BaseFileHandler {
         System.out.println("After startup : total rows number in the Database : " + rowNum);
         System.out.println("After startup : total deleted rows  in the Database : " + deletedRowNum);
     }
+
+    // to read the data (byte array stream) from the file (data after is deleted column)
     Person readFromByteStream(final DataInputStream stream) throws IOException {
         Person person = new Person();
         int nameLength = stream.readInt();
@@ -74,7 +84,7 @@ public class BaseFileHandler {
 
         return person;
     }
-
+    // read one row data and return the whole row without isDeleted column
     byte[] readRowRecord(long bytePositionOfRow) throws IOException {
         this.dbFile.seek(bytePositionOfRow);
         if (this.dbFile.readBoolean())
@@ -97,6 +107,7 @@ public class BaseFileHandler {
         this.dbFile.close();
     }
 
+    // Load all data from the db file and return list of debug row information for each record
     public List<DebugRowInfo> loadAllDataFromFile() throws IOException {
         if(this.dbFile.length() == 0){
             return new ArrayList<>();
@@ -117,5 +128,20 @@ public class BaseFileHandler {
 
         }
         return result;
+    }
+
+   public boolean deleteFile() throws IOException {
+        this.dbFile.close();
+        if(new File(this.dbFileName).delete()){
+            System.out.println("File has been deleted");
+            return true;
+        } else {
+            System.out.println("File has not been deleted");
+            return false;
+        }
+    }
+
+    public String getDBName() {
+        return this.dbFileName;
     }
 }

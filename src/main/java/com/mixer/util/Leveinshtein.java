@@ -2,6 +2,10 @@ package com.mixer.util;
 
 import java.util.stream.IntStream;
 
+/**
+ * This clsss is a leveinshtein algorithm implementaion to find the distance between two string
+ * which will be used to search a string value within the database
+ */
 public class Leveinshtein{
     public Leveinshtein() {
     }

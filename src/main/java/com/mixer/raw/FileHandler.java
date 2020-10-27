@@ -11,8 +11,11 @@ import java.util.Set;
 public class FileHandler extends BaseFileHandler{
 
 
-    public FileHandler(String dbFileName) throws FileNotFoundException {
+    public FileHandler(final String dbFileName) throws FileNotFoundException {
         super(dbFileName);
+    }
+    public FileHandler(final RandomAccessFile randomAccessFile ,final String dbFileName ) {
+        super(randomAccessFile,dbFileName);
     }
 
     public boolean add(String name,
@@ -74,7 +77,9 @@ public class FileHandler extends BaseFileHandler{
         this.dbFile.writeInt(description.length());
         this.dbFile.write(description.getBytes());
 
+        // add to the index (row number , byte position)
         Index.getInstance().add(currentPositionToInsert);
+        // add to names index (name , row number)
         Index.getInstance().addNameToIndex(name,Index.getInstance().getTotalNumberOfRows() - 1);
         return true;
     }
@@ -104,16 +109,16 @@ public class FileHandler extends BaseFileHandler{
         Index.getInstance().remove(rowNumber);
 
     }
-
+    // update record by row number
     public void update(long rowNumber, String name, int age, String address, String carPlateNumber, String description) throws IOException, DuplicateNameException {
         // updating a row will change the record length, to avoid that we delete and add
         this.deleteRow(rowNumber);
         this.add(name, age,address,carPlateNumber,description);
     }
 
+    // update row by its contain (person name)
     public void update(String nameToModify, String name, int age, String address, String carPlateNumber, String description) throws IOException, DuplicateNameException {
         long rowNumber = Index.getInstance().getRowNumberByName(nameToModify);
-        System.out.println(rowNumber);
         this.update(rowNumber,name, age,address,carPlateNumber,description);
     }
 
@@ -125,7 +130,7 @@ public class FileHandler extends BaseFileHandler{
             return this.readRow(rowNumber);
         }
     }
-
+    // search in database rows using Leveinshtein algorithm
     public List<Person> searchWithLeveinshtein(String name, int tolerance) throws IOException {
         List<Person> result = new ArrayList<>();
         Set<String> names = Index.getInstance().getNames();
@@ -146,7 +151,7 @@ public class FileHandler extends BaseFileHandler{
         }
         return result;
     }
-
+    // search in database rows by regular expressions
     public List<Person> searchWithRegexp(String regexp) throws IOException {
         List<Person> result = new ArrayList<>();
         Set<String> names = Index.getInstance().getNames();
