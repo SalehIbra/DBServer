@@ -6,8 +6,15 @@ import com.mixer.exceptions.DuplicateNameException;
 import com.mixer.raw.Index;
 import com.mixer.raw.Person;
 import com.mixer.util.DebugRowInfo;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 public class TestApp {
@@ -19,15 +26,79 @@ public class TestApp {
 
     private void performTest() {
         try {
-            fragmentDatabase();
+   //         fragmentDatabase();
 //            listAllRecord();
 //            defragmentDB();
 //            System.out.println("-------- after defragmentation --------");
 //            listAllRecord();
+            deleteDatabase();
+            doMultipleThreadTest();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    // to avoid deleting manually when restart my app
+    void deleteDatabase(){
+        File file = new File("Dbserver.db");
+        if (file.exists())
+            file.delete();
+    }
+
+    void doMultipleThreadTest() throws IOException {
+        // create task that is going to wait for three threads before it starts
+        CountDownLatch latch = new CountDownLatch(3);
+
+        try (DBServer db = new DBServer(dbFile)){
+            Runnable runnableAdd = ()-> {
+              while (true){
+                  int i = new Random().nextInt(4000);
+                  Person person = new Person("John" + i, 44, "Berlin", "www-123", "This is description");
+                  try {
+                      db.add(person);
+                  } catch (IOException e) {
+                      e.printStackTrace();
+                  } catch (DuplicateNameException e) {
+                      e.printStackTrace();
+                  }
+              }
+            };
+
+            Runnable runnableUpdate = ()-> {
+                while (true){
+                    int i = new Random().nextInt(4000);
+                    Person person = new Person("John"+ i +"_updated", 44, "Berlin", "www-123", "This is description");
+                    try {
+                        db.update("John"+ i,person);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (DuplicateNameException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            Runnable runnableListAll = ()-> {
+                while (true){
+                    try {
+                        db.listAllRowWithDebug();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            // user thread pools and submit them for execution to an instance of a thread pool
+            ExecutorService executorService = Executors.newFixedThreadPool(3);
+            executorService.submit(runnableListAll);
+            executorService.submit(runnableUpdate);
+            executorService.submit(runnableAdd);
+            // The main task waits for four threads, these will be endless process
+            latch.await();
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
     public void defragmentDB() throws IOException, DuplicateNameException {
         try(DBServer db = new DBServer(dbFile)) {
             db.defragmentDatabase();

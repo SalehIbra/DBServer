@@ -1,7 +1,9 @@
 package com.mixer.raw;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class to store indexed fields. When we search records, then we
@@ -11,15 +13,15 @@ import java.util.Set;
 public class Index {
     private static Index index;
     // row number, byte position
-    private final HashMap<Long, Long> rowIndex;
+    private final ConcurrentHashMap<Long, Long> rowIndex;
     //for update by row we use this map to get list of names in db with the corresponding row number
     // String name long rownumber
-    private final HashMap<String,Long> nameIndex;
+    private final ConcurrentHashMap<String,Long> nameIndex;
     private long totalRowNumber = 0;
 
     private Index() {
-        this.rowIndex = new HashMap<>();
-        this.nameIndex = new HashMap<>();
+        this.rowIndex = new ConcurrentHashMap<>();
+        this.nameIndex = new ConcurrentHashMap<>();
     }
 
     public static Index getInstance() {
@@ -29,17 +31,17 @@ public class Index {
         return index;
     }
 
-    public void add(long bytePosition) {
+    public synchronized void add(long bytePosition) {
         this.rowIndex.put(totalRowNumber, bytePosition);
         this.totalRowNumber++;
     }
 
-    public void remove(long row) {
+    public synchronized void remove(long row) {
         this.rowIndex.remove(row);
         this.totalRowNumber--;
     }
 
-    public long getTotalNumberOfRows() {
+    public synchronized long getTotalNumberOfRows() {
         return this.totalRowNumber;
     }
 
@@ -65,7 +67,7 @@ public class Index {
         return this.nameIndex.keySet();
     }
 
-    public void clear(){
+    public synchronized void clear(){
         this.totalRowNumber = 0;
         this.rowIndex.clear();
         this.nameIndex.clear();
